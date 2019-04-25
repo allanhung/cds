@@ -19,11 +19,11 @@ type Pipeliner interface {
 type PipelineV1 struct {
 	Version      string                    `json:"version,omitempty" yaml:"version,omitempty" description:"The version for the current pipeline file (v1.0)"`
 	Name         string                    `json:"name,omitempty" yaml:"name,omitempty" description:"The name of the pipeline"`
-	Description  string                    `json:"description,omitempty" yaml:"description,omitempty" `
-	Parameters   map[string]ParameterValue `json:"parameters,omitempty" yaml:"parameters,omitempty"`
-	Stages       []string                  `json:"stages,omitempty" yaml:"stages,omitempty"` //Here Stage.Jobs will NEVER be set
-	StageOptions map[string]Stage          `json:"options,omitempty" yaml:"options,omitempty"`
-	Jobs         []Job                     `json:"jobs,omitempty" yaml:"jobs,omitempty"`
+	Description  string                    `json:"description,omitempty" yaml:"description,omitempty" description:"The description of the pipeline"`
+	Parameters   map[string]ParameterValue `json:"parameters,omitempty" yaml:"parameters,omitempty" description:"The list of parameters of the pipeline"`
+	Stages       []string                  `json:"stages,omitempty" yaml:"stages,omitempty" description:"The list of stage's names for the pipeline"`
+	StageOptions map[string]Stage          `json:"options,omitempty" yaml:"options,omitempty" description:"The options for stages of the pipeline"` //Here Stage.Jobs will NEVER be set
+	Jobs         []Job                     `json:"jobs,omitempty" yaml:"jobs,omitempty" description:"The list of jobs for the pipeline"`
 }
 
 // PipelineVersion is a version

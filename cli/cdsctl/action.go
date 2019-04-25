@@ -11,6 +11,7 @@ import (
 
 	"github.com/ovh/cds/cli"
 	"github.com/ovh/cds/sdk"
+	actionSDK "github.com/ovh/cds/sdk/action"
 	"github.com/ovh/cds/sdk/exportentities"
 )
 
@@ -35,6 +36,7 @@ func action() *cobra.Command {
 		cli.NewCommand(actionBuiltinCmd, nil, []*cobra.Command{
 			cli.NewListCommand(actionBuiltinListCmd, actionBuiltinListRun, nil),
 			cli.NewGetCommand(actionBuiltinShowCmd, actionBuiltinShowRun, nil),
+			cli.NewCommand(actionBuiltinDocCmd, actionBuiltinDocRun, nil),
 		}),
 	})
 }
@@ -158,7 +160,7 @@ func actionDeleteRun(v cli.Values) error {
 
 var actionDocCmd = cli.Command{
 	Name:  "doc",
-	Short: "Generate Action Documentation: cdsctl action doc <path-to-file>",
+	Short: "Generate action documentation: cdsctl action doc <path-to-file>",
 	Args: []cli.Arg{
 		{Name: "path"},
 	},
@@ -282,4 +284,47 @@ func actionBuiltinShowRun(v cli.Values) (interface{}, error) {
 	}
 
 	return newActionDisplay(*action), nil
+}
+
+var actionBuiltinDocCmd = cli.Command{
+	Name:  "doc",
+	Short: "Generate Builtin action documentation: cdsctl action builtin doc <name>",
+	Args: []cli.Arg{
+		{Name: "name"},
+	},
+}
+
+func actionBuiltinDocRun(v cli.Values) error {
+	p := v.GetString("name")
+
+	var act sdk.Action
+	switch p {
+	case sdk.ScriptAction:
+		act = actionSDK.Script
+	case sdk.JUnitAction:
+		act = actionSDK.JUnit
+	case sdk.CoverageAction:
+		act = actionSDK.Coverage
+	case sdk.GitCloneAction:
+		act = actionSDK.GitClone
+	case sdk.CheckoutApplicationAction:
+		act = actionSDK.CheckoutApplication
+	case sdk.DeployApplicationAction:
+		act = actionSDK.DeployApplication
+	case sdk.GitTagAction:
+		act = actionSDK.GitTag
+	case sdk.ReleaseAction:
+		act = actionSDK.Release
+	case sdk.ServeStaticFiles:
+		act = actionSDK.ServeStaticFiles
+	case sdk.ArtifactUpload:
+		act = actionSDK.ArtifactUpload
+	case sdk.ArtifactDownload:
+		act = actionSDK.ArtifactDownload
+	default:
+		return fmt.Errorf("Invalid given action name")
+	}
+
+	fmt.Println(sdk.ActionInfoMarkdown(act, path.Base(p)))
+	return nil
 }

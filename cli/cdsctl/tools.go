@@ -123,11 +123,17 @@ func setDescriptionForStruct(sch *jsonschema.Schema, typ reflect.Type) {
 		return
 	}
 
+	numFields := typ.NumField()
+	fields := make(map[string]reflect.StructField, numFields)
+	for i := 0; i < numFields; i++ {
+		field := typ.Field(i)
+		yamlName := strings.SplitN(field.Tag.Get("yaml"), ",", 2)
+		fields[yamlName[0]] = field
+	}
+
 	// set description for all current type properties
 	for name, property := range sch.Definitions[typ.Name()].Properties {
-		field, ok := typ.FieldByNameFunc(func(n string) bool {
-			return strings.ToLower(n) == name
-		})
+		field, ok := fields[name]
 		if ok {
 			property.Description = field.Tag.Get(tagDescription)
 			// recusively set description for properties type
