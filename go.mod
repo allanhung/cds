@@ -285,3 +285,5 @@ replace github.com/go-gorp/gorp => github.com/yesnault/gorp v0.0.0-2018083115000
 replace github.com/docker/docker => github.com/docker/engine v0.0.0-20180816081446-320063a2ad06
 
 replace github.com/ovh/cds/sdk/interpolate => ./sdk/interpolate
+
+replace github.com/fsamin/go-dump => github.com/richardlt/go-dump v0.0.0-20190530092628-7e74e489d264

@@ -35,7 +35,6 @@ var (
 								Name: "MyPipeline t1_1",
 								Actions: []sdk.Action{
 									{
-
 										Type:    sdk.BuiltinAction,
 										Name:    sdk.ScriptAction,
 										Enabled: true,
@@ -48,7 +47,6 @@ var (
 										},
 									},
 									{
-
 										Type:    sdk.BuiltinAction,
 										Name:    sdk.ScriptAction,
 										Enabled: true,
@@ -97,7 +95,6 @@ var (
 										},
 									},
 									{
-
 										Type:    sdk.BuiltinAction,
 										Name:    sdk.ArtifactUpload,
 										Enabled: true,
@@ -171,7 +168,6 @@ var (
 							Description: "This is job 1",
 							Actions: []sdk.Action{
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -184,7 +180,6 @@ var (
 									},
 								},
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -204,7 +199,6 @@ var (
 							Description: "This is job 2",
 							Actions: []sdk.Action{
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -217,7 +211,6 @@ var (
 									},
 								},
 								{
-
 									Type:           sdk.BuiltinAction,
 									Name:           sdk.ScriptAction,
 									Enabled:        false,
@@ -259,7 +252,6 @@ var (
 							Description: "This is job 1",
 							Actions: []sdk.Action{
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -272,7 +264,6 @@ var (
 									},
 								},
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -293,7 +284,6 @@ var (
 							Description: "This is job 2",
 							Actions: []sdk.Action{
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -306,7 +296,6 @@ var (
 									},
 								},
 								{
-
 									Type:           sdk.BuiltinAction,
 									Name:           sdk.ScriptAction,
 									Enabled:        false,
@@ -341,7 +330,6 @@ var (
 							Description: "This is job 1",
 							Actions: []sdk.Action{
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
@@ -354,7 +342,6 @@ var (
 									},
 								},
 								{
-
 									Type:    sdk.BuiltinAction,
 									Name:    sdk.ScriptAction,
 									Enabled: true,
