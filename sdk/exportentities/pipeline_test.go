@@ -560,7 +560,7 @@ jobs:
 	assert.Equal(t, sdk.ArtifactUpload, p.Stages[0].Jobs[0].Action.Actions[1].Name)
 	assert.Equal(t, sdk.ArtifactUpload, p.Stages[0].Jobs[0].Action.Actions[2].Name)
 	assert.Equal(t, sdk.ServeStaticFiles, p.Stages[0].Jobs[0].Action.Actions[3].Name)
-	assert.Len(t, p.Stages[0].Jobs[0].Action.Actions[0].Parameters, 8)
+	assert.Len(t, p.Stages[0].Jobs[0].Action.Actions[0].Parameters, 6)
 	assert.Len(t, p.Stages[0].Jobs[0].Action.Actions[1].Parameters, 2)
 	assert.Len(t, p.Stages[0].Jobs[0].Action.Actions[2].Parameters, 1)
 }

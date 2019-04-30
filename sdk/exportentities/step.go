@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/ovh/cds/sdk"
 )
 
@@ -27,12 +28,25 @@ func newStep(act sdk.Action) Step {
 	case sdk.BuiltinAction:
 		switch act.Name {
 		case sdk.ScriptAction:
-			var step StepScript
+			// TODO use type for step script
+			/*
+			   var step StepScript
+			   script := sdk.ParameterFind(&act.Parameters, "script")
+			   if script != nil {
+			     step = StepScript(strings.SplitN(script.Value, "\n", -1))
+			   }
+			   s.Script = &step
+			*/
+			var step []string
 			script := sdk.ParameterFind(&act.Parameters, "script")
 			if script != nil {
-				step = StepScript(strings.SplitN(script.Value, "\n", -1))
+				step = strings.SplitN(script.Value, "\n", -1)
 			}
-			s.Script = &step
+			if len(step) == 1 {
+				s.Script = step[0]
+			} else {
+				s.Script = step
+			}
 		case sdk.CoverageAction:
 			s.Coverage = &StepCoverage{}
 			path := sdk.ParameterFind(&act.Parameters, "path")
@@ -66,19 +80,37 @@ func newStep(act sdk.Action) Step {
 				s.ArtifactDownload.Enabled = enabled.Value
 			}
 		case sdk.ArtifactUpload:
+			// TODO use type for artifact upload
+			/*
+				s.ArtifactUpload = &StepArtifactUpload{}
+				path := sdk.ParameterFind(&act.Parameters, "path")
+				if path != nil {
+				  s.ArtifactUpload.Path = path.Value
+				}
+				tag := sdk.ParameterFind(&act.Parameters, "tag")
+				if tag != nil {
+				  s.ArtifactUpload.Tag = tag.Value
+				}
+				destination := sdk.ParameterFind(&act.Parameters, "destination")
+				if destination != nil {
+				  s.ArtifactUpload.Destination = destination.Value
+				}
+			*/
+			step := make(map[string]string)
 			s.ArtifactUpload = &StepArtifactUpload{}
 			path := sdk.ParameterFind(&act.Parameters, "path")
 			if path != nil {
-				s.ArtifactUpload.Path = path.Value
+				step["path"] = path.Value
 			}
 			tag := sdk.ParameterFind(&act.Parameters, "tag")
 			if tag != nil {
-				s.ArtifactUpload.Tag = tag.Value
+				step["tag"] = tag.Value
 			}
 			destination := sdk.ParameterFind(&act.Parameters, "destination")
 			if destination != nil {
-				s.ArtifactUpload.Destination = destination.Value
+				step["destination"] = destination.Value
 			}
+			s.ArtifactUpload = step
 		case sdk.ServeStaticFiles:
 			s.ServeStaticFiles = &StepServeStaticFiles{}
 			name := sdk.ParameterFind(&act.Parameters, "name")
@@ -237,65 +269,65 @@ type StepScript []string
 
 // StepCoverage represents exported coverage step.
 type StepCoverage struct {
-	Path    string `json:"path,omitempty" yaml:"path,omitempty" structs:"path,omitempty"`
-	Format  string `json:"format,omitempty" yaml:"format,omitempty" structs:"format,omitempty"`
-	Minimum string `json:"minimum,omitempty" yaml:"minimum,omitempty" structs:"minimum,omitempty"`
+	Path    string `json:"path,omitempty" yaml:"path,omitempty"`
+	Format  string `json:"format,omitempty" yaml:"format,omitempty"`
+	Minimum string `json:"minimum,omitempty" yaml:"minimum,omitempty"`
 }
 
 // StepArtifactDownload represents exported artifact download step.
 type StepArtifactDownload struct {
-	Path    string `json:"path,omitempty" yaml:"path,omitempty" jsonschema:"required" structs:"path,omitempty"`
-	Tag     string `json:"tag,omitempty" yaml:"tag,omitempty" structs:"tag,omitempty"`
-	Pattern string `json:"pattern,omitempty" yaml:"pattern,omitempty" structs:"pattern,omitempty"`
-	Enabled string `json:"enabled,omitempty" yaml:"enabled,omitempty" structs:"enabled,omitempty"`
+	Path    string `json:"path,omitempty" yaml:"path,omitempty" jsonschema:"required"`
+	Tag     string `json:"tag,omitempty" yaml:"tag,omitempty"`
+	Pattern string `json:"pattern,omitempty" yaml:"pattern,omitempty"`
+	Enabled string `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 }
 
 // StepArtifactUpload represents exported artifact upload step.
 type StepArtifactUpload struct {
-	Path        string `json:"path,omitempty" yaml:"name,omitempty" jsonschema:"required" structs:"path,omitempty"`
-	Tag         string `json:"tag,omitempty" yaml:"tag,omitempty" structs:"tag,omitempty"`
-	Destination string `json:"destination,omitempty" yaml:"destination,omitempty" structs:"destination,omitempty"`
+	Path        string `json:"path,omitempty" yaml:"name,omitempty" jsonschema:"required"`
+	Tag         string `json:"tag,omitempty" yaml:"tag,omitempty"`
+	Destination string `json:"destination,omitempty" yaml:"destination,omitempty"`
 }
 
 // StepServeStaticFiles represents exported serve static files step.
 type StepServeStaticFiles struct {
-	Name        string `json:"name,omitempty yaml:"name,omitempty" structs:"name,omitempty"`
-	Path        string `json:"path,omitempty yaml:"path,omitempty" structs:"path,omitempty"`
-	Entrypoint  string `json:"entrypoint,omitempty yaml:"entrypoint,omitempty" structs:"entrypoint,omitempty"`
-	StaticKey   string `json:"static-key,omitempty yaml:"static-key,omitempty" structs:"static-key,omitempty"`
-	Destination string `json:"destination,omitempty yaml:"destination,omitempty" structs:"destination,omitempty"`
+	Name        string `json:"name,omitempty" yaml:"name,omitempty"`
+	Path        string `json:"path,omitempty" yaml:"path,omitempty"`
+	Entrypoint  string `json:"entrypoint,omitempty" yaml:"entrypoint,omitempty"`
+	StaticKey   string `json:"static-key,omitempty" yaml:"static-key,omitempty"`
+	Destination string `json:"destination,omitempty" yaml:"destination,omitempty"`
 }
 
 // StepGitClone represents exported git clone step.
 type StepGitClone struct {
-	Branch     string `json:"branch,omitempty" yaml:"branch,omitempty" structs:"branch,omitempty"`
-	Commit     string `json:"commit,omitempty" yaml:"commit,omitempty" structs:"commit,omitempty"`
-	Directory  string `json:"directory,omitempty" yaml:"directory,omitempty" structs:"directory,omitempty"`
-	Password   string `json:"password,omitempty" yaml:"password,omitempty" structs:"password,omitempty"`
-	PrivateKey string `json:"privateKey,omitempty" yaml:"privateKey,omitempty" structs:"privateKey,omitempty"`
-	URL        string `json:"url,omitempty" yaml:"url,omitempty" structs:"url,omitempty"`
-	User       string `json:"user,omitempty" yaml:"user,omitempty" structs:"user,omitempty"`
-	Depth      string `json:"depth,omitempty" yaml:"depth,omitempty" structs:"depth,omitempty"`
-	SubModules string `json:"submodules,omitempty" yaml:"submodules,omitempty" structs:"submodules,omitempty"`
-	Tag        string `json:"tag,omitempty" yaml:"tag,omitempty" structs:"tag,omitempty"`
+	Branch     string `json:"branch,omitempty" yaml:"branch,omitempty"`
+	Commit     string `json:"commit,omitempty" yaml:"commit,omitempty"`
+	Directory  string `json:"directory,omitempty" yaml:"directory,omitempty"`
+	Password   string `json:"password,omitempty" yaml:"password,omitempty"`
+	PrivateKey string `json:"privateKey,omitempty" yaml:"privateKey,omitempty"`
+	URL        string `json:"url,omitempty" yaml:"url,omitempty"`
+	User       string `json:"user,omitempty" yaml:"user,omitempty"`
+	Depth      string `json:"depth,omitempty" yaml:"depth,omitempty"`
+	SubModules string `json:"submodules,omitempty" yaml:"submodules,omitempty"`
+	Tag        string `json:"tag,omitempty" yaml:"tag,omitempty"`
 }
 
 // StepRelease represents exported release step.
 type StepRelease struct {
 	Artifacts   string `json:"artifacts,omitempty" yaml:"artifacts,omitempty"`
-	ReleaseNote string `json:"releaseNote,omitempty" yaml:"releaseNote,omitempty" structs:"releaseNote,omitempty"`
-	Tag         string `json:"tag,omitempty" yaml:"tag,omitempty" structs:"tag,omitempty"`
-	Title       string `json:"title,omitempty" yaml:"title,omitempty" structs:"title,omitempty"`
+	ReleaseNote string `json:"releaseNote,omitempty" yaml:"releaseNote,omitempty"`
+	Tag         string `json:"tag,omitempty" yaml:"tag,omitempty"`
+	Title       string `json:"title,omitempty" yaml:"title,omitempty"`
 }
 
 // StepGitTag represents exported git tag step.
 type StepGitTag struct {
-	Path          string `json:"path,omitempty" yaml:"path,omitempty" structs:"path,omitempty"`
-	TagLevel      string `json:"tagLevel,omitempty" yaml:"tagLevel,omitempty" structs:"tagLevel,omitempty"`
-	TagMessage    string `json:"tagMessage,omitempty" yaml:"tagMessage,omitempty" structs:"tagMessage,omitempty"`
-	TagMetadata   string `json:"tagMetadata,omitempty" yaml:"tagMetadata,omitempty" structs:"tagMetadata,omitempty"`
-	TagPrerelease string `json:"tagPrerelease,omitempty" yaml:"tagPrerelease,omitempty" structs:"tagPrerelease,omitempty"`
-	Prefix        string `json:"prefix,omitempty" yaml:"prefix,omitempty" structs:"prefix,omitempty"`
+	Path          string `json:"path,omitempty" yaml:"path,omitempty"`
+	TagLevel      string `json:"tagLevel,omitempty" yaml:"tagLevel,omitempty"`
+	TagMessage    string `json:"tagMessage,omitempty" yaml:"tagMessage,omitempty"`
+	TagMetadata   string `json:"tagMetadata,omitempty" yaml:"tagMetadata,omitempty"`
+	TagPrerelease string `json:"tagPrerelease,omitempty" yaml:"tagPrerelease,omitempty"`
+	Prefix        string `json:"prefix,omitempty" yaml:"prefix,omitempty"`
 }
 
 // StepJUnitReport represents exported junit report step.
@@ -309,11 +341,15 @@ type StepDeploy string
 
 // Step represents exported step used in a job.
 type Step struct {
-	StepCustom       `json:",inline" yaml:",inline"`
-	Script           *StepScript           `json:"script,omitempty" yaml:"script,omitempty"`
+	StepCustom `json:",inline" yaml:",inline"`
+	// TODO use type for script
+	//Script           *StepScript           `json:"script,omitempty" yaml:"script,omitempty"`
+	Script           interface{}           `json:"script,omitempty" yaml:"script,omitempty" jsonschema:"-"`
 	Coverage         *StepCoverage         `json:"coverage,omitempty" yaml:"coverage,omitempty"`
 	ArtifactDownload *StepArtifactDownload `json:"artifactDownload,omitempty" yaml:"artifactDownload,omitempty"`
-	ArtifactUpload   *StepArtifactUpload   `json:"artifactUpload,omitempty" yaml:"artifactUpload,omitempty"`
+	// TODO use type for artifact upload
+	//ArtifactUpload   *StepArtifactUpload   `json:"artifactUpload,omitempty" yaml:"artifactUpload,omitempty"`
+	ArtifactUpload   interface{}           `json:"artifactUpload,omitempty" yaml:"artifactUpload,omitempty" jsonschema:"-"`
 	ServeStaticFiles *StepServeStaticFiles `json:"serveStaticFiles,omitempty" yaml:"serveStaticFiles,omitempty"`
 	GitClone         *StepGitClone         `json:"gitClone,omitempty" yaml:"gitClone,omitempty" jsonschema_description:"Clone a git repository\nhttps://ovh.github.io/cds/docs/actions/gitclone"`
 	GitTag           *StepGitTag           `json:"gitTag,omitempty" yaml:"gitTag,omitempty"`
@@ -388,7 +424,7 @@ func (s Step) toAction() (*sdk.Action, error) {
 	} else if s.isCoverage() {
 		a, err = s.asCoverage()
 	} else if s.isScript() {
-		a = s.asScript()
+		a, err = s.asScript()
 	} else {
 		a = s.asAction()
 	}
@@ -406,18 +442,40 @@ func (s Step) toAction() (*sdk.Action, error) {
 
 func (s Step) isScript() bool { return s.Script != nil }
 
-func (s Step) asScript() sdk.Action {
-	return sdk.Action{
+func (s Step) asScript() (sdk.Action, error) {
+	var a sdk.Action
+	/*
+	   val := strings.Join(*s.Script, "\n")
+	*/
+
+	var val string
+	if script, ok := s.Script.([]interface{}); ok {
+		lines := make([]string, len(script))
+		for i := range script {
+			if line, ok := script[i].(string); ok {
+				lines[i] = line
+			}
+		}
+		val = strings.Join(lines, "\n")
+	} else if script, ok := s.Script.(string); ok {
+		val = script
+	} else {
+		return a, sdk.NewErrorFrom(sdk.ErrMalformattedStep, "invalid given data for script action")
+	}
+
+	a = sdk.Action{
 		Name: sdk.ScriptAction,
 		Type: sdk.BuiltinAction,
 		Parameters: []sdk.Parameter{
 			{
 				Name:  "script",
-				Value: strings.Join(*s.Script, "\n"),
+				Value: val,
 				Type:  sdk.TextParameter,
 			},
 		},
 	}
+
+	return a, nil
 }
 
 func (s Step) isArtifactDownload() bool { return s.ArtifactDownload != nil }
@@ -529,9 +587,22 @@ func (s Step) isArtifactUpload() bool { return s.ArtifactUpload != nil }
 
 func (s Step) asArtifactUpload() (sdk.Action, error) {
 	var a sdk.Action
-	m, err := stepToMap(s.ArtifactUpload)
-	if err != nil {
-		return a, err
+	// TODO use type for artifact upload
+	/*
+			m, err := stepToMap(s.ArtifactUpload)
+			if err != nil {
+				return a, err
+		  }
+	*/
+	var m map[string]string
+	if upload, ok := s.ArtifactUpload.(map[interface{}]interface{}); ok {
+		if err := mapstructure.Decode(upload, &m); err != nil {
+			return a, sdk.NewErrorWithStack(err, sdk.ErrMalformattedStep)
+		}
+	} else if upload, ok := s.ArtifactUpload.(string); ok {
+		m = map[string]string{"path": upload}
+	} else {
+		return a, sdk.NewErrorFrom(sdk.ErrMalformattedStep, "invalid given data for artifact upload action")
 	}
 	a = sdk.Action{
 		Name:       sdk.ArtifactUpload,
