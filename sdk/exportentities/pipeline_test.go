@@ -2,7 +2,6 @@ package exportentities
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -596,57 +595,6 @@ jobs:
 	assert.Len(t, p.Stages[0].Jobs[0].Action.Actions, 1)
 	assert.Equal(t, sdk.CheckoutApplicationAction, p.Stages[0].Jobs[0].Action.Actions[0].Name)
 	assert.Len(t, p.Stages[0].Jobs[0].Action.Actions[0].Parameters, 1)
-}
-
-func Test_IsFlagged(t *testing.T) {
-	testc := []struct {
-		flag     string
-		step     Step
-		expected bool
-	}{
-		{
-			flag:     "enabled",
-			step:     Step{"enabled": true},
-			expected: true,
-		},
-		{
-			flag:     "enabled",
-			step:     Step{"enabled": false, "optional": true},
-			expected: false,
-		},
-		{
-			flag:     "optional",
-			step:     Step{"optional": true},
-			expected: true,
-		},
-		{
-			flag:     "always_executed",
-			step:     Step{"optional": false},
-			expected: false,
-		},
-		{
-			flag:     "always_executed",
-			step:     Step{"optional": false, "always_executed": true},
-			expected: true,
-		},
-		{
-			flag:     "optional",
-			step:     Step{"always_executed": true},
-			expected: false,
-		},
-		{
-			flag:     "always_executed",
-			step:     Step{"always_executed": true, "enabled": false, "optional": false},
-			expected: true,
-		},
-	}
-
-	for _, tc := range testc {
-		resp, err := tc.step.IsFlagged(tc.flag)
-		test.NoError(t, err, fmt.Sprintf("Flag %s should not return an error in this step", tc.flag))
-		assert.Equal(t, tc.expected, resp, fmt.Sprintf("Flag %s have bad value in this step", tc.flag))
-	}
-
 }
 
 func TestExportPipelineV1_YAML(t *testing.T) {
